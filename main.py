@@ -1,4 +1,5 @@
 import pygame
+import pygame_menu
 from paddle import Paddle
 from ball import Ball
 
@@ -11,7 +12,7 @@ SCREEN_LENGTH = 840
 SCREEN_HEIGHT = 720
 SCREEN_LENGTH_MID = SCREEN_LENGTH/2
 
-def updateScreen(screen, clock, allSpritesList):
+def updateScreen(screen, clock, allSpritesList, humanScore, computerScore):
 
     # OBJECTIVE: Update everything displayed on the screen
 
@@ -39,15 +40,21 @@ def updateScreen(screen, clock, allSpritesList):
     # Set FPS to 60
     clock.tick(60)
 
-def updatePaddles(keysPressed):
+def updatePaddles(keysPressed, paddleA=None, paddleB=None):
 
     # OBJECTIVE: Update paddles' movements
 
-    if keysPressed[pygame.K_UP]:
-        humanPaddle.moveUp(5)
+    if keysPressed[pygame.K_UP] and paddleA != None:
+        paddleA.moveUp(5)
 
-    if keysPressed[pygame.K_DOWN]:
-        humanPaddle.moveDown(5)
+    if keysPressed[pygame.K_DOWN] and paddleA != None:
+        paddleA.moveDown(5)
+
+    if keysPressed[pygame.K_w] and paddleB != None:
+        paddleB.moveUp(5)
+
+    if keysPressed[pygame.K_s] and paddleB != None:
+        paddleB.moveDown(5)
 
 def updateBall(ball, computerScore, humanScore):
 
@@ -137,14 +144,9 @@ def updateBallVelocity(ball, oldScore, humanScore):
 
     return oldScore, humanScore
 
-if __name__ == "__main__":
+def onePlayer():
 
-    # Initialize pygame
-    pygame.init()
-
-    # Create a window
-    screen = pygame.display.set_mode((SCREEN_LENGTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("Anthony's Pong Game")
+    # OBJECTIVE: Execute function for single player mode
 
     # Initialize scores
     computerScore = 0
@@ -171,9 +173,6 @@ if __name__ == "__main__":
     allSpritesList.add(humanPaddle)
     allSpritesList.add(ball)
 
-    # Boolean variable to update ball's velocity
-    increaseBallSpeed = False
-
     # Boolean variable to play/stop game
     continueGame = True
 
@@ -190,7 +189,7 @@ if __name__ == "__main__":
 
         # Get input from user
         keysPressed = pygame.key.get_pressed()
-        updatePaddles(keysPressed)
+        updatePaddles(keysPressed, paddleA=humanPaddle)
 
         # Call update() from all sprites
         allSpritesList.update()
@@ -209,7 +208,90 @@ if __name__ == "__main__":
         oldScore, humanScore = updateBallVelocity(ball, oldScore, humanScore)
 
         # Update screen
-        updateScreen(screen, clock, allSpritesList)
+        updateScreen(screen, clock, allSpritesList, humanScore, computerScore)
 
     # Quit pygame
     pygame.quit()
+
+def twoPlayer():
+    
+    # Initialize scores
+    scoreA = 0
+    scoreB = 0
+    oldScore = 0
+    highScore = 0
+
+    # Create paddles
+    playerOne = Paddle(WHITE, 10, 100)
+    playerOne.rect.x = 20 # <= Starting X,Y positions
+    playerOne.rect.y = 300
+
+    playerTwo = Paddle(WHITE, 10, 100)
+    playerTwo.rect.x = 815
+    playerTwo.rect.y = 300
+
+    # Create the ball
+    ball = Ball(WHITE, 10, 10)
+    ball.rect.x = (playerOne.rect.x + playerTwo.rect.x) // 2
+    ball.rect.y = 300
+
+    # Create a list of all sprites
+    allSpritesList = pygame.sprite.Group()
+    allSpritesList.add(playerOne)
+    allSpritesList.add(playerTwo)
+    allSpritesList.add(ball)
+
+    # Boolean variable to play/stop game
+    continueGame = True
+
+    # Initialize clock to control screen's FPS
+    clock = pygame.time.Clock()
+
+    while continueGame:
+
+        # Look for keyboard inputs
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT: # NOTE: QUIT refers to "close window" button
+                continueGame = False
+
+        # Get input from user
+        keysPressed = pygame.key.get_pressed()
+        updatePaddles(keysPressed, paddleB=playerOne, paddleA=playerTwo) # NOTE: Personal preference :)
+
+        # Call update() from all sprites
+        allSpritesList.update()
+
+        # Update ball's movement
+        scoreA, scoreB = updateBall(ball, scoreA, scoreB)
+
+        # Detect collisions between paddles and ball
+        if pygame.sprite.collide_mask(ball, playerOne) or pygame.sprite.collide_mask(ball, playerTwo):
+            ball.bounce()
+
+        # Update high score (ternary operator)
+        highScore = scoreA if scoreA >= scoreB else scoreB
+        oldScore, highScore = updateBallVelocity(ball, oldScore, highScore)
+
+        # Update screen
+        updateScreen(screen, clock, allSpritesList, scoreB, scoreA)
+
+    # Quit pygame
+    pygame.quit()
+
+if __name__ == "__main__":
+
+    # Initialize pygame
+    pygame.init()
+
+    # Create a window
+    screen = pygame.display.set_mode((SCREEN_LENGTH, SCREEN_HEIGHT))
+    pygame.display.set_caption("Anthony's Pong Game")
+
+    # Create a menu
+    mainMenu = pygame_menu.Menu(300, 400, "Select Mode")
+    mainMenu.add_button("Solo", onePlayer)
+    mainMenu.add_button("2 Player", twoPlayer)
+
+    # Run main menu
+    mainMenu.mainloop(screen)

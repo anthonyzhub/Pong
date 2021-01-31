@@ -47,6 +47,6 @@ class Ball(pygame.sprite.Sprite):
         # OBJECTIVE: Increase ball's velocity for difficulty
 
         # print("\nVelocity before: {}".format(self.velocity))
-        self.velocity[0] *= 2
-        self.velocity[1] *= 2
+        self.velocity[0] *= 1.5
+        self.velocity[1] *= 1.5
         # print("Velocity now: {}".format(self.velocity))
