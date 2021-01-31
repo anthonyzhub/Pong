@@ -131,7 +131,7 @@ def updateBallVelocity(ball, oldScore, humanScore):
     # NOTE: Don't increase speed, if score hasn't changed.
     # E.g. Let's say it's 10 for 5 minutes, then don't continuously increase speed for the next 5 minutes
     if oldScore != humanScore:
-        if humanScore % 2 == 0:
+        if humanScore % 10 == 0:
             ball.increaseVelocity()
             oldScore = humanScore
 
