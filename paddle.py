@@ -15,15 +15,12 @@ class Paddle(pygame.sprite.Sprite):
         self.image = pygame.Surface([width, height]) # <= Create box
         self.image.fill(BLACK) # <= Fill box's insides with black
         self.image.set_colorkey(BLACK)
-        # self.image.set_colorkey((255, 255, 255))
 
         # Draw paddle
         pygame.draw.rect(self.image, color, [0, 0, width, height])
 
         # Get paddle's dimensions
         self.rect = self.image.get_rect()
-        self.topPoint = self.rect.y - (height//2)
-        self.bottomPoint = self.rect.y + (height//2)
 
     def moveUp(self, pixels):
 

@@ -8,8 +8,8 @@ WHITE = (255, 255, 255)
 
 # Screen dimensions
 SCREEN_LENGTH = 840
-SCREEN_WIDTH = 720
-SCREEN_MID = SCREEN_LENGTH/2
+SCREEN_HEIGHT = 720
+SCREEN_LENGTH_MID = SCREEN_LENGTH/2
 
 def updateScreen(screen, clock, allSpritesList):
 
@@ -20,15 +20,15 @@ def updateScreen(screen, clock, allSpritesList):
 
     # Draw tennis net dividing the window
     # NOTE: line(surface, color, start pos, end pos, width)
-    pygame.draw.line(screen, WHITE, [SCREEN_LENGTH//2, 0], [SCREEN_LENGTH//2, SCREEN_WIDTH], 10)
+    pygame.draw.line(screen, WHITE, [SCREEN_LENGTH//2, 0], [SCREEN_LENGTH//2, SCREEN_HEIGHT], 10)
 
     # Update scoreboard
     font = pygame.font.Font(None, 74)
     text = font.render(str(computerScore), 1, WHITE)
-    screen.blit(text, (SCREEN_MID//2, 10))
+    screen.blit(text, (SCREEN_LENGTH_MID//2, 10))
 
     text = font.render(str(humanScore), 1, WHITE)
-    screen.blit(text, (SCREEN_MID + (SCREEN_MID//2), 10))
+    screen.blit(text, (SCREEN_LENGTH_MID + (SCREEN_LENGTH_MID//2), 10))
 
     # Draw sprites on the window
     allSpritesList.draw(screen)
@@ -53,21 +53,25 @@ def updateBall(ball, computerScore, humanScore):
 
     # OBJECTIVE: Update ball's movement
 
+    # Right side
     if ball.rect.x >= SCREEN_LENGTH - 10:
         ball.velocity[0] = -ball.velocity[0]
         computerScore += 1
         # print("Decreasing X velocity")
 
-    if ball.rect.x <= 0:
+    # Left side
+    if ball.rect.x <= 10:
         ball.velocity[0] = -ball.velocity[0]
         humanScore += 1
         # print("Increasing X velocity")
 
-    if ball.rect.y > SCREEN_WIDTH - 10:
+    # Bottom side
+    if ball.rect.y >= SCREEN_HEIGHT - 10:
         ball.velocity[1] = -ball.velocity[1]
         # print("Decreasing Y velocity")
 
-    if ball.rect.y < 0:
+    # Top side
+    if ball.rect.y <= 0:
         ball.velocity[1] = -ball.velocity[1]
         # print("Increasing Y velocity")
 
@@ -120,18 +124,32 @@ def updateComputerPaddle(computerPaddle, ball):
         if computerPaddle.rect.y > ball.rect.y:
             computerPaddle.moveUp(5)
 
+def updateBallVelocity(ball, oldScore, humanScore):
+
+    # OBJECTIVE: For every 10th score, increase ball's velocity
+
+    # NOTE: Don't increase speed, if score hasn't changed.
+    # E.g. Let's say it's 10 for 5 minutes, then don't continuously increase speed for the next 5 minutes
+    if oldScore != humanScore:
+        if humanScore % 2 == 0:
+            ball.increaseVelocity()
+            oldScore = humanScore
+
+    return oldScore, humanScore
+
 if __name__ == "__main__":
 
     # Initialize pygame
     pygame.init()
 
     # Create a window
-    screen = pygame.display.set_mode((SCREEN_LENGTH, SCREEN_WIDTH))
+    screen = pygame.display.set_mode((SCREEN_LENGTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Anthony's Pong Game")
 
     # Initialize scores
     computerScore = 0
     humanScore = 0
+    oldScore = 0
 
     # Create paddles
     computerPaddle = Paddle(WHITE, 10, 100)
@@ -152,6 +170,9 @@ if __name__ == "__main__":
     allSpritesList.add(computerPaddle)
     allSpritesList.add(humanPaddle)
     allSpritesList.add(ball)
+
+    # Boolean variable to update ball's velocity
+    increaseBallSpeed = False
 
     # Boolean variable to play/stop game
     continueGame = True
@@ -183,6 +204,9 @@ if __name__ == "__main__":
         # Detect collisions between paddles and ball
         if pygame.sprite.collide_mask(ball, computerPaddle) or pygame.sprite.collide_mask(ball, humanPaddle):
             ball.bounce()
+
+        # Update high score (ternary operator)
+        oldScore, humanScore = updateBallVelocity(ball, oldScore, humanScore)
 
         # Update screen
         updateScreen(screen, clock, allSpritesList)

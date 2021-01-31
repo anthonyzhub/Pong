@@ -26,8 +26,6 @@ class Ball(pygame.sprite.Sprite):
 
         # Get ball's dimensions
         self.rect = self.image.get_rect()
-        self.topPoint = self.rect.y - (height//2)
-        self.bottomPoint = self.rect.y + (height//2)
 
     def update(self):
 
@@ -43,3 +41,12 @@ class Ball(pygame.sprite.Sprite):
 
         self.velocity[0] = -self.velocity[0]
         self.velocity[1] = -self.velocity[1]
+
+    def increaseVelocity(self):
+
+        # OBJECTIVE: Increase ball's velocity for difficulty
+
+        # print("\nVelocity before: {}".format(self.velocity))
+        self.velocity[0] *= 2
+        self.velocity[1] *= 2
+        # print("Velocity now: {}".format(self.velocity))
