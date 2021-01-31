@@ -22,6 +22,8 @@ class Paddle(pygame.sprite.Sprite):
 
         # Get paddle's dimensions
         self.rect = self.image.get_rect()
+        self.topPoint = self.rect.y - (height//2)
+        self.bottomPoint = self.rect.y + (height//2)
 
     def moveUp(self, pixels):
 

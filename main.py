@@ -73,6 +73,53 @@ def updateBall(ball, computerScore, humanScore):
 
     return computerScore, humanScore
 
+def updateComputerPaddle(computerPaddle, ball):
+
+    # OBJECTIVE: Update computer's paddle when ball moves
+
+    # METHOD 1: Get's stuck
+    # if computerPaddle.rect.y <= ball.rect.y:
+    #     computerPaddle.moveUp(5)
+
+    # if computerPaddle.rect.y > ball.rect.y:
+    #     computerPaddle.moveDown(5)
+
+    # METHOD 2: Slightly unrealistic. It'd keep on moving beyond ball's projection
+    # # Ball moving down
+    # if ball.velocity[1] > 0:
+
+    #     # Move paddle down
+    #     computerPaddle.moveDown(5)
+
+    #     # Stop paddle
+    #     if computerPaddle.rect.y <= ball.rect.y:
+    #         return
+
+    # # Ball moving up
+    # if ball.velocity[1] < 0:
+
+    #     # Move paddle up
+    #     computerPaddle.moveUp(5)
+
+    #     # Stop paddle
+    #     if computerPaddle.rect.y > ball.rect.y:
+    #         return
+
+    # METHOD 3: Move paddle based on y position
+    # Ball moving down
+    if ball.velocity[1] > 0:
+
+        # Move paddle
+        if computerPaddle.rect.y < ball.rect.y:
+            computerPaddle.moveDown(5)
+
+    # Ball moving up
+    if ball.velocity[1] < 0:
+
+        # Move paddle
+        if computerPaddle.rect.y > ball.rect.y:
+            computerPaddle.moveUp(5)
+
 if __name__ == "__main__":
 
     # Initialize pygame
@@ -129,6 +176,9 @@ if __name__ == "__main__":
 
         # Update ball's movement
         computerScore, humanScore = updateBall(ball, computerScore, humanScore)
+
+        # Update computer's paddle
+        updateComputerPaddle(computerPaddle, ball)
 
         # Detect collisions between paddles and ball
         if pygame.sprite.collide_mask(ball, computerPaddle) or pygame.sprite.collide_mask(ball, humanPaddle):

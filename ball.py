@@ -26,9 +26,14 @@ class Ball(pygame.sprite.Sprite):
 
         # Get ball's dimensions
         self.rect = self.image.get_rect()
+        self.topPoint = self.rect.y - (height//2)
+        self.bottomPoint = self.rect.y + (height//2)
 
     def update(self):
 
+        # OBJECTIVE: Update ball's X & Y position
+
+        # Update ball's positioning based on velocity
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
 
