@@ -48,16 +48,22 @@ class Ball(pygame.sprite.Sprite):
         self.velocity[1] *= 1.5
         # print("Velocity now: {}".format(self.velocity))
 
-    def boost(self):
+    def addBoost(self):
 
-        # OBJECTIVE: Temporairly increase ball's velocity when key is pressend
+        # OBJECTIVE: Temporairly increase ball's velocity when key is pressed
 
-        # Increase velocity
-        print("\nVelocity before: {}".format(self.velocity))
-        self.velocity[0] *= 2
-        self.velocity[1] *= 2
+        print("\nBoost enabled")
+        print("Velocity before: {}".format(self.velocity))
+        self.velocity[0] *= 1.5
+        self.velocity[1] *= 1.5
         print("Velocity After: {}".format(self.velocity))
 
-        # Decrease velocity
-        self.velocity[0] /= 2
-        self.velocity[1] /= 2
+    def removeBoost(self):
+
+        # OBJECTIVE: Reduce speed after passing screen's midpoint
+
+        print("\nBoost disabled")
+        print("Velocity before: {}".format(self.velocity))
+        self.velocity[0] /= 1.5
+        self.velocity[1] /= 1.5
+        print("Velocity After: {}".format(self.velocity))

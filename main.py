@@ -64,9 +64,6 @@ def resetBallPosition(ball):
     ball.rect.x = SCREEN_LENGTH_MID
     ball.rect.y = 300
 
-    # Reset ball's velocity
-    ball.velocity
-
 def updateBall(ball, computerScore, humanScore):
 
     # OBJECTIVE: Update ball's movement
@@ -203,6 +200,9 @@ def onePlayer():
 
     # Boolean variable to play/stop game
     continueGame = True
+    
+    # Boolean variable to enable/disable boost on ball
+    boostEnabled = False
 
     # Initialize clock to control screen's FPS
     clock = pygame.time.Clock()
@@ -230,7 +230,21 @@ def onePlayer():
 
         # Detect collisions between paddles and ball
         if pygame.sprite.collide_mask(ball, computerPaddle) or pygame.sprite.collide_mask(ball, humanPaddle):
+
+            # Get new input from user
+            keysPressed = pygame.key.get_pressed()
+
+            # Add boost if button was pressed
+            if keysPressed[pygame.K_SPACE] and pygame.sprite.collide_mask(ball, humanPaddle):
+                boostEnabled = True
+                ball.addBoost()
+
             ball.bounce()
+
+        # If boost is enabled, disable after passing midpoint
+        if boostEnabled == True and ball.rect.x <= SCREEN_LENGTH_MID:
+            ball.removeBoost()
+            boostEnabled = False
 
         # Update high score (ternary operator)
         oldScore, humanScore = updateBallVelocity(ball, oldScore, humanScore)
