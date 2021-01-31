@@ -56,20 +56,33 @@ def updatePaddles(keysPressed, paddleA=None, paddleB=None):
     if keysPressed[pygame.K_s] and paddleB != None:
         paddleB.moveDown(5)
 
+def resetBallPosition(ball):
+
+    # OBJECTIVE: Reset ball position after a goal was made
+    
+    # Reset ball's X & Y position
+    ball.rect.x = SCREEN_LENGTH_MID
+    ball.rect.y = 300
+
+    # Reset ball's velocity
+    ball.velocity
+
 def updateBall(ball, computerScore, humanScore):
 
     # OBJECTIVE: Update ball's movement
 
     # Right side
     if ball.rect.x >= SCREEN_LENGTH - 10:
-        ball.velocity[0] = -ball.velocity[0]
+        # ball.velocity[0] = -ball.velocity[0]
         computerScore += 1
+        resetBallPosition(ball)
         # print("Decreasing X velocity")
 
     # Left side
     if ball.rect.x <= 10:
-        ball.velocity[0] = -ball.velocity[0]
+        # ball.velocity[0] = -ball.velocity[0]
         humanScore += 1
+        resetBallPosition(ball)
         # print("Increasing X velocity")
 
     # Bottom side
@@ -117,18 +130,33 @@ def updateComputerPaddle(computerPaddle, ball):
     #         return
 
     # METHOD 3: Move paddle based on y position
+    # # Ball moving down
+    # if ball.velocity[1] > 0:
+
+    #     # Move paddle
+    #     if computerPaddle.rect.y < ball.rect.y:
+    #         computerPaddle.moveDown(5)
+
+    # # Ball moving up
+    # if ball.velocity[1] < 0:
+
+    #     # Move paddle
+    #     if computerPaddle.rect.y > ball.rect.y:
+    #         computerPaddle.moveUp(5)
+
+    # METHOD 4: Similar to #3, but adjusted y values for anticipation
     # Ball moving down
     if ball.velocity[1] > 0:
 
         # Move paddle
-        if computerPaddle.rect.y < ball.rect.y:
+        if computerPaddle.rect.y < ball.rect.y - 10:
             computerPaddle.moveDown(5)
 
     # Ball moving up
     if ball.velocity[1] < 0:
 
         # Move paddle
-        if computerPaddle.rect.y > ball.rect.y:
+        if computerPaddle.rect.y > ball.rect.y - 10:
             computerPaddle.moveUp(5)
 
 def updateBallVelocity(ball, oldScore, humanScore):
@@ -222,23 +250,23 @@ def twoPlayer():
     highScore = 0
 
     # Create paddles
-    playerOne = Paddle(WHITE, 10, 100)
-    playerOne.rect.x = 20 # <= Starting X,Y positions
-    playerOne.rect.y = 300
-
     playerTwo = Paddle(WHITE, 10, 100)
-    playerTwo.rect.x = 815
+    playerTwo.rect.x = 20 # <= Starting X,Y positions
     playerTwo.rect.y = 300
+
+    playerOne = Paddle(WHITE, 10, 100)
+    playerOne.rect.x = 815
+    playerOne.rect.y = 300
 
     # Create the ball
     ball = Ball(WHITE, 10, 10)
-    ball.rect.x = (playerOne.rect.x + playerTwo.rect.x) // 2
+    ball.rect.x = SCREEN_LENGTH_MID
     ball.rect.y = 300
 
     # Create a list of all sprites
     allSpritesList = pygame.sprite.Group()
-    allSpritesList.add(playerOne)
     allSpritesList.add(playerTwo)
+    allSpritesList.add(playerOne)
     allSpritesList.add(ball)
 
     # Boolean variable to play/stop game
@@ -257,7 +285,8 @@ def twoPlayer():
 
         # Get input from user
         keysPressed = pygame.key.get_pressed()
-        updatePaddles(keysPressed, paddleB=playerOne, paddleA=playerTwo) # NOTE: Personal preference :)
+        # updatePaddles(keysPressed, ball, paddleB=playerTwo, paddleA=playerOne) # NOTE: Personal preference :)
+        updatePaddles(keysPressed, playerOne, playerTwo) # NOTE: Personal preference :)
 
         # Call update() from all sprites
         allSpritesList.update()
@@ -266,7 +295,7 @@ def twoPlayer():
         scoreA, scoreB = updateBall(ball, scoreA, scoreB)
 
         # Detect collisions between paddles and ball
-        if pygame.sprite.collide_mask(ball, playerOne) or pygame.sprite.collide_mask(ball, playerTwo):
+        if pygame.sprite.collide_mask(ball, playerTwo) or pygame.sprite.collide_mask(ball, playerOne):
             ball.bounce()
 
         # Update high score (ternary operator)

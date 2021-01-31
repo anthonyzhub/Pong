@@ -2,8 +2,6 @@ import pygame
 from random import randint
 
 BLACK = (0,0,0)
-X_VELOCITY = 7
-Y_VELOCITY = 7
 
 class Ball(pygame.sprite.Sprite):
 
@@ -21,8 +19,7 @@ class Ball(pygame.sprite.Sprite):
         pygame.draw.rect(self.image, color, [0, 0, width, height])
 
         # Set velocity
-        # self.velocity = [randint(4, 8), randint(-8, 8)]
-        self.velocity = [X_VELOCITY, Y_VELOCITY]
+        self.velocity = [randint(-5, 8), randint(5, 8)]
 
         # Get ball's dimensions
         self.rect = self.image.get_rect()
@@ -50,3 +47,17 @@ class Ball(pygame.sprite.Sprite):
         self.velocity[0] *= 1.5
         self.velocity[1] *= 1.5
         # print("Velocity now: {}".format(self.velocity))
+
+    def boost(self):
+
+        # OBJECTIVE: Temporairly increase ball's velocity when key is pressend
+
+        # Increase velocity
+        print("\nVelocity before: {}".format(self.velocity))
+        self.velocity[0] *= 2
+        self.velocity[1] *= 2
+        print("Velocity After: {}".format(self.velocity))
+
+        # Decrease velocity
+        self.velocity[0] /= 2
+        self.velocity[1] /= 2
